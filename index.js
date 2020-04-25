@@ -8,7 +8,8 @@ const subscribeCommand = '{"command": "subscribe", "streams": ["ledger", "consen
 
 const phases = ['open', 'establish', 'accepted']
 
-let lastConsensus;
+let lastConsensus
+let lastUpdate = Math.floor(Date.now() / 1000)
 
 sendSms = (msg) => {
     const xhr = new XMLHttpRequest();
@@ -19,7 +20,7 @@ sendSms = (msg) => {
     xhr.send(msg);
 }
 
-isNominalConsus = (consensus) => {
+validatePhasesSeq = (consensus) => {
 
     if (!lastConsensus) {
         if (phases.includes(consensus)) {
@@ -38,9 +39,10 @@ isNominalConsus = (consensus) => {
 
 connection.onmessage = msg => {
     const data = JSON.parse(msg.data)
+    lastUpdate = Math.floor(Date.now() / 1000)
     switch (data.type) {
         case 'consensusPhase':
-            if (!isNominalConsus(data.consensus)) {
+            if (!validatePhasesSeq(data.consensus)) {
                 sendSms('Abnormal consensus phase, please take a look, NOOOWWWWWW!')
                 process.exit(1)
             }
@@ -60,7 +62,6 @@ connection.onmessage = msg => {
                 // process.exit(1)
             }
             break
-
     }
 }
 
@@ -68,6 +69,13 @@ connection.onopen = e => {
     console.log("connected");
     connection.send(subscribeCommand)
 }
+
+setInterval(() => {
+   if (Math.floor(Date.now() / 1000) - lastUpdate > 5) {
+       sendSms('Validator has not given any sign of life for 5 seconds, plase take a look')
+       process.exit(1)
+   }
+}, 10000)
 
 
 
