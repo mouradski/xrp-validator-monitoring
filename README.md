@@ -1,4 +1,4 @@
-# Simple XRP Validator monitor
+# Simple XRP Validator monitoring
 
 Create an account for free at : https://sms.to/ (3 free sms)
 
