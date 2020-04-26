@@ -15,9 +15,9 @@ sendSms = (msg) => {
     const xhr = new XMLHttpRequest();
     xhr.withCredentials = true;
 
-    xhr.open("POST", "https://api.sms.to/sms/send?api_key=" + process.env.SMS_API_KEY + "&to=" + process.env.SMS_DESTINATION_NUMBER + "&message=test&sender_id=validator");
+    xhr.open("POST", "https://api.sms.to/sms/send?api_key=" + process.env.SMS_API_KEY + "&to=" + process.env.SMS_DESTINATION_NUMBER + "&message=" + encodeURIComponent(msg) + "&sender_id=validator");
 
-    xhr.send(msg);
+    xhr.send("");
 }
 
 validatePhasesSeq = (consensus) => {
